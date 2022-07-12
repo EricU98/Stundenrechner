@@ -1,0 +1,205 @@
+﻿@page "/"
+@page "/stundenrechner"
+
+
+
+
+@{
+    if (result != null)
+    {
+        <div class="alert alert-success" role="alert">
+            <h4>ERGEBNIS</h4>
+            <h5><b>Tage: </b>@resultDay</h5>
+            <h5><b>Stunden: </b>@resultHour</h5>
+            <h5><b>Minuten: </b>@resultMinute</h5>
+            <h5><b>Sekunden: </b>@resultSecond</h5>
+            <hr>
+            <h5><b>@resultHour:@resultMinute:@resultSecond</b></h5>
+
+        </div>
+    }
+}
+
+<form>
+
+    <div class="card border-success">
+        <div class="card-header">
+            <h3>Startdatum</h3>
+        </div>
+        <div class="card-body bg-success bg-opacity-25  ">
+
+            <input class="input-group form-control" @bind-value="start" type="date" />
+            <br />
+            <div class="input-group mb-3 text-center ">
+                <select @bind="h" class="form-control">
+                    @{
+                        foreach (var item in hours)
+                        {
+                            <option value="@item.TrimStart('0')">@item</option>
+                        }
+                    }
+                </select>
+                <span class="input-group-text" id="basic-addon1">:</span>
+                <select @bind="m" class="form-control">
+                    @{
+                        foreach (var item in minutes)
+                        {
+                            <option value="@item.TrimStart('0')">@item</option>
+                        }
+                    }
+                </select>
+                <span class="input-group-text" id="basic-addon1">:</span>
+                <select @bind="s" class="form-control">
+                    @{
+                        foreach (var item in seconds)
+                        {
+                            <option value="@item.TrimStart('0')">@item</option>
+                        }
+                    }
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+    <!--
+
+    HIER ENDDATUM EINFÜGEN
+
+    -->
+
+
+
+    <br />
+    <hr />
+    <br />
+    <div class="card border-success">
+        <div class="card-header">
+            <h3>Enddatum</h3>
+        </div>
+        <div class="card-body bg-success bg-opacity-25 ">
+
+            <input class="input-group form-control" @bind-value="end" type="date" />
+            <br />
+            <div class="input-group mb-3 text-center ">
+                <select @bind="endHour" class="form-control">
+                    @{
+                        foreach (var item in hours)
+                        {
+                            <option value="@item.TrimStart('0')">@item</option>
+                        }
+                    }
+                </select>
+                <span class="input-group-text" id="basic-addon1">:</span>
+                <select @bind="endMinute" class="form-control">
+                    @{
+                        foreach (var item in minutes)
+                        {
+                            <option value="@item.TrimStart('0')">@item</option>
+                        }
+                    }
+                </select>
+                <span class="input-group-text" id="basic-addon1">:</span>
+                <select @bind="endSecond" class="form-control">
+                    @{
+                        foreach (var item in seconds)
+                        {
+                            <option value="@item.TrimStart('0')">@item</option>
+                        }
+                    }
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+
+</form>
+<br />
+
+<div class="card">
+    <a class="card-body btn bg-success bg-opacity-50" @onclick="@(() => getHours())" href="#">
+        <h3><b>Zeit erfassen</b></h3>
+    </a>
+</div>
+
+
+
+@*<a>@stunde : @minute : @sekunde</a>*@
+
+@code {
+    private double totalHours;
+
+
+    private DateTime start = DateTime.Today.Date;
+    private DateTime end = DateTime.Today.Date;
+
+
+    private int y = DateTime.Now.Year;
+    private int mo = DateTime.Now.Month;
+    private int d = DateTime.Now.Day;
+    private int h = DateTime.Now.Hour;
+    private int m = DateTime.Now.Minute;
+    private int s = DateTime.Now.Second;
+
+
+    private int endYear = DateTime.Now.Year;
+    private int endMonth = DateTime.Now.Month;
+    private int endDay = DateTime.Now.Day;
+    private int endHour = DateTime.Now.Hour;
+    private int endMinute = DateTime.Now.Minute;
+    private int endSecond = DateTime.Now.Second;
+
+    private IEnumerable<string> hours;
+    private IEnumerable<string> minutes;
+    private IEnumerable<string> seconds;
+
+    private int hourNow = DateTime.Now.Hour;
+    private int minuteNow = DateTime.Now.Minute;
+
+    private string resultDay;
+    private string resultHour;
+    private string resultMinute;
+    private string resultSecond;
+
+    private string result;
+
+
+    private async Task getHours()
+    {
+
+        TimeSpan a = new TimeSpan();
+
+        DateTime startz = new DateTime(y, mo, d, h, m, s);
+        DateTime endz = new DateTime(end.Year, end.Month, end.Day, endHour, endMinute, endSecond);
+
+        totalHours = (endz - startz).TotalMinutes;
+        a = (endz - startz);
+
+        result = a.ToString();
+
+
+        resultDay = a.Days.ToString();
+        resultHour = a.Hours.ToString();
+        resultMinute = a.Minutes.ToString();
+        resultSecond = a.Seconds.ToString();
+
+
+
+        totalHours = Math.Round(totalHours, 2);
+
+    }
+
+    //private int stunde = DateTime.Now.Hour;
+    //private int minute = DateTime.Now.Minute;
+    //private int sekunde = DateTime.Now.Second;
+
+
+    protected override void OnInitialized()
+    {
+        hours = Enumerable.Range(hourNow, 23).Select(i => (DateTime.MinValue.AddHours(i)).ToString("HH"));
+        minutes = Enumerable.Range(0, 60).Select(i => (DateTime.MinValue.AddMinutes(i)).ToString("mm"));
+        seconds = Enumerable.Range(0, 61).Select(i => (DateTime.MinValue.AddSeconds(i)).ToString("ss"));
+    }
+
+}
