@@ -2,23 +2,13 @@
 @page "/stundenrechner"
 
 
+<style>
+    footer {
+        position: fixed;
+        bottom: 0;
+    }</style>
 
 
-@{
-    if (result != null)
-    {
-        <div class="alert alert-success" role="alert">
-            <h4>ERGEBNIS</h4>
-            <h5><b>Tage: </b>@resultDay</h5>
-            <h5><b>Stunden: </b>@resultHour</h5>
-            <h5><b>Minuten: </b>@resultMinute</h5>
-            <h5><b>Sekunden: </b>@resultSecond</h5>
-            <hr>
-            <h5><b>@resultHour:@resultMinute:@resultSecond</b></h5>
-
-        </div>
-    }
-}
 
 <form>
 
@@ -62,17 +52,66 @@
         </div>
     </div>
 
+    <br />
+    <hr />
+
+    @{
+        if (!withBreaks)
+        {
+
+        }
+
+
+
+        if (withBreaks)
+        {
+
+
+
+
+        }
+
+        <div class="card border-success">
+
+            <div class="card-header">
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" @bind="withBreaks" />
+                    <h4 class="form-check-label">
+                        Pausen in Minuten
+                    </h4>
+                </div>
+
+            </div>
+
+            @{
+                if (withBreaks)
+                {
+                    <div class="card-body bg-success bg-opacity-25">
+
+                        <input class="input-group form-control" @bind-value="breakInMinutes" type="number" />
+
+
+                    </div>
+                }
+            }
+
+
+
+        </div>
+
+
+
+    }
+
     <!--
-
-    HIER ENDDATUM EINFÜGEN
-
+    HIER PAUSENZEIT EINFÜGEN
     -->
-
-
 
     <br />
     <hr />
     <br />
+
     <div class="card border-success">
         <div class="card-header">
             <h3>Enddatum</h3>
@@ -122,8 +161,32 @@
         <h3><b>Zeit erfassen</b></h3>
     </a>
 </div>
+<br />
+@{
+    if (result != null)
+    {
+        <div class="alert alert-success" role="alert">
+            <h4>ERGEBNIS</h4>
+            <h5><b>Tage: </b>@resultDay</h5>
+            <h5><b>Stunden: </b>@resultHour Stunde(n)</h5>
+            <h5><b>Minuten: </b>@resultMinute Minute(n)</h5>
+            <h5><b>Sekunden: </b>@resultSecond Sekunde(n)</h5>
+            @{
+                if (withBreaks)
+                {
+                    <h5><b>Pause: </b>@breakInMinutes</h5>
+                }
+            }
 
+            <hr>
+            <h5><b>@resultHour:@resultMinute:@breakInMinutes</b></h5>
 
+        </div>
+    }
+}
+ <footer>
+            <p style="font-size:20px">&copy; @DateTime.Now.Year - Made by EricU98 - <a href="https://github.com/EricU98">GitHub</a></p>
+        </footer>
 
 @*<a>@stunde : @minute : @sekunde</a>*@
 
@@ -164,17 +227,40 @@
 
     private string result;
 
+    private bool withBreaks = false;
+    private int breakInMinutes = 0;
+
+
 
     private async Task getHours()
     {
+
 
         TimeSpan a = new TimeSpan();
 
         DateTime startz = new DateTime(y, mo, d, h, m, s);
         DateTime endz = new DateTime(end.Year, end.Month, end.Day, endHour, endMinute, endSecond);
 
-        totalHours = (endz - startz).TotalMinutes;
-        a = (endz - startz);
+        //DateTime breaks = new DateTime(0, 0, 0, 0, breakInMinutes, 0);
+
+
+        //totalHours = (endz - startz).TotalMinutes;
+        if (withBreaks)
+        {
+
+            var zz = TimeSpan.FromMinutes(breakInMinutes);
+
+            a = (endz - startz) - zz;
+
+
+        }
+
+        else if (!withBreaks)
+        {
+            a = (endz - startz);
+        }
+
+
 
         result = a.ToString();
 
@@ -186,7 +272,7 @@
 
 
 
-        totalHours = Math.Round(totalHours, 2);
+        //totalHours = Math.Round(totalHours, 2);
 
     }
 
